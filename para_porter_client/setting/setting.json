@@ -1,0 +1,10 @@
+{
+  "comment": [
+    "test"
+  ],
+  "host_ip": "127.0.0.1",
+  "client_ips": [
+    "127.0.0.1"
+  ],
+  "host_watch_folder":["."]
+}

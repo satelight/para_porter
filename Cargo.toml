@@ -1,0 +1,1 @@
+workspace = { members = [ "library", "para_porter_client","para_porter_server"],resolver = "2" }
