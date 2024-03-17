@@ -1,6 +1,3 @@
-use std::io::{BufRead,BufWriter, Read, Write};
-use encoding_rs::SHIFT_JIS;
-
 #[derive(Debug,serde::Deserialize,serde::Serialize)]
 pub struct ShiftjisFile {
     pub file_name:String,

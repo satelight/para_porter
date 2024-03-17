@@ -1,7 +1,7 @@
-use library::para_info::{self, ParaInfo, ParaKind};
+use library::para_info::{ParaInfo, ParaKind};
 use library::encode_shift_jis::ShiftjisFile;
 use library::setting_json::{SettingFile, SETTING_JSON};
-use rocket::serde::{Serialize,json::Json};
+use rocket::serde::json::Json;
 
 #[macro_use] extern crate rocket;
 
