@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use library::para_info::{ParaInfo, ParaKind};
 use library::encode_shift_jis::ShiftjisFile;
 use library::setting_json::{SettingFile, SETTING_JSON};
