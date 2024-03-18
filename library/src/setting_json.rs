@@ -35,4 +35,15 @@ impl SettingFile {
         }
 
     }
+
+    pub fn read()-> Self {
+        let setting_folder = std::path::Path::new(SETTING_FOLDER);
+        let setting_json_path = setting_folder.join(SETTING_JSON);
+
+        let s = std::fs::read_to_string(setting_json_path).unwrap();
+        serde_json::from_str(&s).unwrap()
+    }
+
+
+
 }

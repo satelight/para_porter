@@ -7,8 +7,6 @@ use rocket::serde::json::Json;
 
 #[macro_use] extern crate rocket;
 
-
-
 #[get("/")]
 fn index() -> Json<ParaInfo> {
     let shift_jis_file = ShiftjisFile::to_utf8("sample/CO0013Q9(mh5a0-a).txt");
@@ -21,7 +19,7 @@ fn index() -> Json<ParaInfo> {
 }
 
 #[post("/post_para",data="<para_info>")]
-fn post_para(para_info:Json<ParaInfo>) {
+fn post_para(para_info:Json<ParaInfo>){
     println!("{:?}",para_info.0.file_name);
 }
 

@@ -2,18 +2,20 @@
 
 use library::para_info::{ParaInfo,ParaKind};
 mod porter;
+use porter::Porter;
 
 const POST_URL:&str = "http://127.0.0.1:8000/post_para";
 
 
 #[tokio::main]
 async fn main() {
-    
-    let query = ParaInfo { 
-        file_name: Some("test.txt".to_string()), 
+    let porter_bot = Porter::init();
+    let para_luggage = ParaInfo { 
+        file_name: Some("t.txt".to_string()), 
         content: Some("tesgabagarta".to_string()), 
         para_kind:Some(ParaKind::Omote) 
     };
-    porter::Porter::send_post(POST_URL, &query).await;
+
+    porter_bot.send_post(POST_URL, &para_luggage).await;
     // println!("{}",res);
 }
