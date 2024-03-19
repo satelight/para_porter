@@ -1,7 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use library::para_info::{ParaInfo, ParaKind};
-use library::encode_shift_jis::ShiftjisFile;
 use library::setting_json::{self, SettingFile, SETTING_JSON};
 use rocket::serde::json::Json;
 
@@ -20,7 +19,6 @@ fn post_para(para_info:Json<ParaInfo>){
         Some(ParaKind::Bariga) =>para_obj.write_file(&setting_content.bariga_folder_path),
         Some(ParaKind::Omote) => para_obj.write_file(&setting_content.omote_folder_path),
         Some(ParaKind::Ura) => para_obj.write_file(&setting_content.ura_folder_path),
-        Some(ParaKind::ItemMaster) => println!("ItemMaster"),
         None => {},
     };
     println!("{:?}",para_obj.file_name);

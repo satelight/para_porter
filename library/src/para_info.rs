@@ -6,7 +6,6 @@ pub enum ParaKind {
     Bariga, // バリ画用ファイル
     Omote,
     Ura,
-    ItemMaster,
 }
 
 #[derive(Debug,serde::Deserialize,serde::Serialize,Clone)]
