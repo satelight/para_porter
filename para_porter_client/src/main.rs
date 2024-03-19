@@ -13,7 +13,7 @@ async fn main() {
     let para_luggage = ParaInfo { 
         file_name: Some("t.txt".to_string()), 
         content: Some("tesgabagarta".to_string()), 
-        para_kind:Some(ParaKind::Omote) 
+        para_kind:Some(ParaKind::Bariga) 
     };
 
     porter_bot.send_post(POST_URL, &para_luggage).await;

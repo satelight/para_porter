@@ -2,7 +2,7 @@
 
 use library::para_info::{ParaInfo, ParaKind};
 use library::encode_shift_jis::ShiftjisFile;
-use library::setting_json::{SettingFile, SETTING_JSON};
+use library::setting_json::{self, SettingFile, SETTING_JSON};
 use rocket::serde::json::Json;
 
 #[macro_use] extern crate rocket;
@@ -10,18 +10,20 @@ use rocket::serde::json::Json;
 #[get("/")]
 fn index() -> &'static str {
     "hello!! para porter site"
-//     let shift_jis_file = ShiftjisFile::to_utf8("sample/CO0013Q9(mh5a0-a).txt");
-
-//     Json(ParaInfo{
-//         file_name:Some(shift_jis_file.file_name),
-//         content:Some(shift_jis_file.utf8_content),
-//         para_kind:Some(ParaKind::Bariga),
-//     })
 }
 
 #[post("/post_para",data="<para_info>")]
 fn post_para(para_info:Json<ParaInfo>){
-    println!("{:?}",para_info.0.file_name);
+    let para_obj = para_info.0;
+    let setting_content = SettingFile::read();
+    match para_obj.para_kind {
+        Some(ParaKind::Bariga) =>para_obj.write_file(&setting_content.bariga_folder_path),
+        Some(ParaKind::Omote) => para_obj.write_file(&setting_content.omote_folder_path),
+        Some(ParaKind::Ura) => para_obj.write_file(&setting_content.ura_folder_path),
+        Some(ParaKind::ItemMaster) => println!("ItemMaster"),
+        None => {},
+    };
+    println!("{:?}",para_obj.file_name);
 }
 
 #[rocket::main]

@@ -6,6 +6,10 @@ pub struct ShiftjisFile {
 
 
 impl ShiftjisFile {
+    pub fn new(file_name:&str,utf_content:&str)-> Self{
+        Self { file_name:file_name.to_string(), utf8_content: utf_content.to_string() }
+    }
+
     pub fn to_utf8(file_name:&str)->Self{
         let file_data = std::fs::read(&file_name).unwrap();
         let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);

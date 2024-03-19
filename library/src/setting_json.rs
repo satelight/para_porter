@@ -41,7 +41,9 @@ impl SettingFile {
         let setting_json_path = setting_folder.join(SETTING_JSON);
 
         let s = std::fs::read_to_string(setting_json_path).unwrap();
-        serde_json::from_str(&s).unwrap()
+        let setting_file:SettingFile = serde_json::from_str(&s).unwrap();
+        
+        setting_file
     }
 
 
