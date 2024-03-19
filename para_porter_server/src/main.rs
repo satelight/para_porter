@@ -1,18 +1,18 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use library::para_info::{ParaInfo, ParaKind};
-use library::setting_json::{self, SettingFile, SETTING_JSON};
+use library::setting_json::{SettingFile, SETTING_JSON};
 use rocket::serde::json::Json;
 
 #[macro_use] extern crate rocket;
 
 #[get("/")]
-fn index() -> &'static str {
+async fn index() -> &'static str {
     "hello!! para porter site"
 }
 
 #[post("/post_para",data="<para_info>")]
-fn post_para(para_info:Json<ParaInfo>){
+async fn post_para(para_info:Json<ParaInfo>){
     let para_obj = para_info.0;
     let setting_content = SettingFile::read();
     match para_obj.para_kind {

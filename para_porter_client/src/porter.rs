@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use library::{encode_shift_jis, para_history_json, para_info, setting_json::SettingFile};
 use serde_json::json;
 
