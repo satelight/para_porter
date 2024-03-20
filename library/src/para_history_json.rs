@@ -37,16 +37,13 @@ impl ParaHistoryJson{
     pub fn write(value:&ParaHistoryInfo){
         let folder_path = std::path::Path::new(SETTING_FOLDER);
         let file_path = folder_path.join(PARAMETA_JSON);
-        let f = std::fs::File::create(&file_path).unwrap();
+        let f = std::fs::File::create(file_path).unwrap();
         serde_json::to_writer_pretty(f, value).unwrap();
     }
     
     #[allow(dead_code)]
     pub fn is_key_file(key:&str,meta_file_content:ParaHistoryContent)->bool{
-        match meta_file_content.get(key){
-            Some(_) => true,
-            None => false,
-        }
+        meta_file_content.get(key).is_some()
     }
 }
 

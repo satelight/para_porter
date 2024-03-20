@@ -16,7 +16,7 @@ async fn post_para(para_info:Json<ParaInfo>){
     let para_obj = para_info.0;
     let setting_content = SettingFile::read();
     match para_obj.para_kind {
-        Some(ParaKind::Bariga) =>para_obj.write_file(&setting_content.bariga_folder_path),
+        Some(ParaKind::Bariga) => para_obj.write_file(&setting_content.bariga_folder_path),
         Some(ParaKind::Omote) => para_obj.write_file(&setting_content.omote_folder_path),
         Some(ParaKind::Ura) => para_obj.write_file(&setting_content.ura_folder_path),
         None => {},

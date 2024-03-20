@@ -11,7 +11,7 @@ impl ShiftjisFile {
     }
 
     pub fn to_utf8(file_name:&str)->Self{
-        let file_data = std::fs::read(&file_name).unwrap();
+        let file_data = std::fs::read(file_name).unwrap();
         let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);
         Self { 
             file_name:file_name.to_string(), 
@@ -21,7 +21,7 @@ impl ShiftjisFile {
 
     pub fn write(&self,to_path:&str)-> bool{
         let (encode,_,_) = encoding_rs::SHIFT_JIS.encode(&self.utf8_content);
-        std::fs::write(to_path, &encode).unwrap();
+        std::fs::write(to_path, encode).unwrap();
         true
     }
 }
