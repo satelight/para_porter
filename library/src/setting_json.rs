@@ -8,6 +8,7 @@ pub struct SettingFile{
     pub omote_folder_path:String,
     pub ura_folder_path:String,
     pub friend_ips:Vec<String>,
+    pub no_target_hinmoku_code:Vec<String>,
 }
 
 
@@ -31,6 +32,7 @@ impl SettingFile {
                 omote_folder_path:"D:/NOKENV/".to_string(), 
                 ura_folder_path: "P:/NOKENV/".to_string(),
                 friend_ips: vec![],
+                no_target_hinmoku_code:vec![],
             };
 
             serde_json::to_writer_pretty(f, &setting_file).unwrap();

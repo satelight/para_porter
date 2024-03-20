@@ -39,6 +39,7 @@ impl ParaInfo {
     }
 
     pub fn write_file(&self,folder_path:&str){
+        std::fs::create_dir_all(folder_path).unwrap();
         let file_name = &self.file_name.clone();
         let written_path = Path::new(folder_path).join(file_name);
         let shift_jis_file = ShiftjisFile::new(file_name,&self.content.clone());       

@@ -3,5 +3,6 @@
   "bariga_folder_path": "Item",
   "omote_folder_path": "NOKENV",
   "ura_folder_path": "NOKENV",
-  "friend_ips": []
+  "friend_ips": [],
+  "no_target_hinmoku_code":[]
 }
