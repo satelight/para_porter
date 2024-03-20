@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use library::para_info::{ParaInfo, ParaKind};
+use library::para_history_json::ParaHistoryJson;
 use library::setting_json::{SettingFile, SETTING_JSON};
 use rocket::serde::json::Json;
 
@@ -16,11 +17,20 @@ async fn post_para(para_info:Json<ParaInfo>){
     let para_obj = para_info.0;
     let setting_content = SettingFile::read();
     match para_obj.para_kind {
-        Some(ParaKind::Bariga) => para_obj.write_file(&setting_content.bariga_folder_path),
-        Some(ParaKind::Omote) => para_obj.write_file(&setting_content.omote_folder_path),
-        Some(ParaKind::Ura) => para_obj.write_file(&setting_content.ura_folder_path),
-        None => {},
+        ParaKind::Bariga => {
+            para_obj.write_file(&setting_content.bariga_folder_path);
+            
+        },
+        ParaKind::Hyomen => {
+            para_obj.write_file(&setting_content.omote_folder_path);
+            para_obj.write_file(&setting_content.ura_folder_path);
+
+        },
     };
+    
+    ParaHistoryJson::init();
+    ParaHistoryJson::write(&para_obj);
+    
     println!("{:?}",para_obj.file_name);
 }
 

@@ -3,6 +3,7 @@ pub const SETTING_JSON:&str = "setting.json";
 
 #[derive(Debug,serde::Serialize,serde::Deserialize)]
 pub struct SettingFile{
+    pub machine_name:String,
     pub bariga_folder_path:String,
     pub omote_folder_path:String,
     pub ura_folder_path:String,
@@ -25,6 +26,7 @@ impl SettingFile {
             std::fs::create_dir_all(setting_folder).unwrap();
             let f = std::fs::File::create(setting_json_path).unwrap();
             let setting_file:SettingFile = SettingFile { 
+                machine_name:"DV999".to_string(),
                 bariga_folder_path: "D:/Item".to_string(), 
                 omote_folder_path:"D:/NOKENV/".to_string(), 
                 ura_folder_path: "P:/NOKENV/".to_string(),

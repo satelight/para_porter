@@ -1,9 +1,11 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, iter::zip};
+use std::time;
+use crate::para_info::ParaInfo;
 
 /// settingフォルダパス
 const SETTING_FOLDER:&str = "setting";
 
-/// パラメータのメタ情報一覧を保存するpara_meta.jsonのパス
+/// パラメータのメタ情報一覧を保存するpara_history.jsonのパス
 const PARAMETA_JSON:&str = "para_history.json";
 
 
@@ -16,16 +18,16 @@ impl ParaHistoryJson{
         if !file_path.exists() {
             let f = std::fs::File::create(&file_path).unwrap();
             let mut content = HashMap::new();
-            let txt_files = ["test.txt","test2.txt"];
-    
-            for txt_file in txt_files {
-                content.insert(txt_file,ParaHistoryInfo::new(txt_file,0));
+            
+            let hinmoku_codes = ["CO1234A0","CO2345A0"];
+            let txt_files = ["CO1234A0(sh5a0-a).txt","CO2345A0(sh5b0-b).txt"];
+            for (himoku_code,txt_file) in zip(hinmoku_codes,txt_files) {
+                content.insert(himoku_code,ParaHistoryInfo::new(txt_file,0,"DV999"));
             }
             serde_json::to_writer_pretty(f, &content).unwrap();
         }
     }
     
-    #[allow(dead_code)]
     pub fn read()-> ParaHistoryContent{
         let folder_path = std::path::Path::new(SETTING_FOLDER);
         let file_path = folder_path.join(PARAMETA_JSON);
@@ -33,34 +35,42 @@ impl ParaHistoryJson{
         serde_json::from_reader(rdr).unwrap()
     }
     
-    #[allow(dead_code)]
-    pub fn write(value:&ParaHistoryInfo){
+    pub fn write(para_info:&ParaInfo){
+        let mut json_content = self::ParaHistoryJson::read();
+        json_content.insert(
+            para_info.hinmoku_code.clone(), 
+            ParaHistoryInfo::new(&para_info.file_name, para_info.update_time_unix_seconds,&para_info.machine_name)
+        );
         let folder_path = std::path::Path::new(SETTING_FOLDER);
         let file_path = folder_path.join(PARAMETA_JSON);
         let f = std::fs::File::create(file_path).unwrap();
-        serde_json::to_writer_pretty(f, value).unwrap();
+        serde_json::to_writer_pretty(f, &json_content).unwrap();
     }
     
-    #[allow(dead_code)]
-    pub fn is_key_file(key:&str,meta_file_content:ParaHistoryContent)->bool{
+    pub fn is_hinmoku_code_key(key:&str,meta_file_content:ParaHistoryContent)->bool{
         meta_file_content.get(key).is_some()
     }
 }
 
+/// Hashmapのkey部分は品目コードとなる。
 pub type ParaHistoryContent = HashMap<String,ParaHistoryInfo>;
 
 
 #[derive(Debug,serde::Serialize,serde::Deserialize)]
 pub struct ParaHistoryInfo{
-    pub file_path: String,
-    pub update_date_time:i64,
+    pub file_name: String,
+    pub update_time:i64,
+    pub original_machine_name:String,
+    pub arrival_time:String,
 }
 
 impl ParaHistoryInfo {
-    fn new(file_path:&str,update_date_time:i64)->Self {
+    pub fn new(file_name:&str,update_time:i64,original_machine_name:&str)->Self {
         Self { 
-            file_path:file_path.to_string(), 
-            update_date_time,
+            file_name:file_name.to_string(), 
+            update_time,
+            original_machine_name:original_machine_name.to_string(),
+            arrival_time:String::from(""),
         }
     }
 }

@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-library = {path = "../library"}
-serde ={ workspace=true}
-serde_json = {workspace=true}
+library = {path = "../library" }
+serde = { workspace = true }
+serde_json = {workspace = true }
+chrono = { workspace = true }
 rocket = { version = "0.5.0", features = ["json"] }
