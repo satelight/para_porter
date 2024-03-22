@@ -2,7 +2,8 @@
 members = [ 
     "library", 
     "para_porter_client",
-    "para_porter_server",
+    "para_porter_server", 
+    "para_seeker/src-tauri",
 ]
 resolver = "2"
 

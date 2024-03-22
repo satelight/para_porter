@@ -4,13 +4,35 @@ use library::para_info::{ParaInfo, ParaKind};
 use library::para_history_json::ParaHistoryJson;
 use library::setting_json::{SettingFile, SETTING_JSON};
 use rocket::serde::json::Json;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 #[macro_use] extern crate rocket;
+
+#[derive(Debug,Serialize,Deserialize)]
+pub struct CheckPara {
+    pub hinmoku_code:String,
+    pub machine_para:String,
+    pub address:String,
+    pub is_para:bool,
+}
 
 #[get("/")]
 async fn index() -> &'static str {
     "hello!! para porter site"
 }
+
+#[get("/check_para/<hinmoku_code>")]
+async fn check_para(hinmoku_code:&str)->Json<CheckPara> {
+    rocket::serde::json::Json( CheckPara{
+        hinmoku_code:hinmoku_code.to_string(),
+        machine_para:"".to_string(),
+        address:"".to_string(),
+        is_para:true,
+    })
+
+}
+
 
 #[post("/post_para",data="<para_info>")]
 async fn post_para(para_info:Json<ParaInfo>){
@@ -40,6 +62,7 @@ async fn main() -> Result<(),rocket::Error> {
         true => {rocket::build()
             .mount("/", routes![index])
             .mount("/", routes![post_para])
+            .mount("/", routes![check_para])
             .launch().await?;}
 
         false => {
