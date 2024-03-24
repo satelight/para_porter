@@ -23,7 +23,7 @@ pub struct ParaInfo {
 
 impl ParaInfo {
     pub fn new(hinmoku_code:&str,file_name:&str,para_kind:ParaKind,machine_name:&str) -> Self{
-        let content = ShiftjisFile::to_utf8(file_name);
+        let content = ShiftjisFile::new(file_name);
         let meta = fs::metadata(file_name).unwrap();
         let mtime = FileTime::from_last_modification_time(&meta);
         let unix_seconds = mtime.unix_seconds();
@@ -40,18 +40,21 @@ impl ParaInfo {
 
     pub fn write_file(&self,folder_path:&str){
         std::fs::create_dir_all(folder_path).unwrap();
-        let file_name = &self.file_name.clone();
-        let written_path = Path::new(folder_path).join(file_name);
-        let shift_jis_file = ShiftjisFile::new(file_name,&self.content.clone());       
+        let written_path = Path::new(folder_path).join(&self.file_name);
+        
+        let shift_jis_file = ShiftjisFile{
+            file_name:self.file_name.clone(),
+            utf8_content:self.content.clone(),
+        };       
         shift_jis_file.write(written_path.to_str().unwrap_or(""));
     }
 
 }
 
-#[test]
-fn filetime_test(){
-    let meta = fs::metadata("t.txt").unwrap();
-    let mtime = FileTime::from_last_modification_time(&meta);
-    let unix_seconds = mtime.unix_seconds();
-    println!("{}",unix_seconds);
-}
+// #[test]
+// fn filetime_test(){
+//     let meta = fs::metadata("t.txt").unwrap();
+//     let mtime = FileTime::from_last_modification_time(&meta);
+//     let unix_seconds = mtime.unix_seconds();
+//     println!("{}",unix_seconds);
+// }
