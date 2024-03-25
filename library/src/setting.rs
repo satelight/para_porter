@@ -1,5 +1,3 @@
-use std::net::IpAddr;
-
 const SETTING_DIR_PATH:&str = "setting";
 pub const SETTING_JSON_PATH:&str = "setting.json";
 

@@ -1,12 +1,11 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use library::para_info::{ParaInfo, ParaKind};
 use library::para_history_json::ParaHistoryJson;
 use library::setting::{SettingJson, SETTING_JSON_PATH,Config};
-use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
 
-#[macro_use] extern crate rocket;
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 
 #[derive(Debug,Serialize,Deserialize)]
 pub struct CheckPara {
@@ -17,22 +16,23 @@ pub struct CheckPara {
 }
 
 #[get("/")]
-async fn index() -> &'static str {
-    "hello!! para porter site"
+async fn index() -> impl Responder {
+    HttpResponse::Ok().body("hello!! para porter site")
 }
 
-#[get("/check_para/<hinmoku_code>")]
-async fn check_para(hinmoku_code:&str)->Json<CheckPara> {
+#[get("/check_para/{hinmoku_code}")]
+async fn check_para(hinmoku_code:web::Path<String>)-> impl Responder {
     let setting_file = SettingJson::read();
     let machine_para = setting_file.machine_name;
     let address = Config::get_my_ip_address();
+    let hinmoku_code = hinmoku_code.into_inner();
 
     let dir = std::fs::read_dir("NOKENV").unwrap();
     let mut is_para = false;
     for dir_entry_result in dir {
         let dir_entry = dir_entry_result.unwrap();
         let file_name = dir_entry.file_name().into_string().unwrap_or_default();
-        match file_name.find(hinmoku_code){
+        match file_name.find(&hinmoku_code){
             Some(_) =>  {
                 is_para = true;
                 break;
@@ -41,7 +41,7 @@ async fn check_para(hinmoku_code:&str)->Json<CheckPara> {
         };
     }
 
-    rocket::serde::json::Json(
+    HttpResponse::Ok().json(
         CheckPara {
             hinmoku_code:hinmoku_code.to_string(),
             machine_para,
@@ -52,11 +52,12 @@ async fn check_para(hinmoku_code:&str)->Json<CheckPara> {
 
 }
 
-#[get("/receive_para/<hinmoku_code>")]
-async fn receive_para(hinmoku_code:&str)->Json<ParaInfo> {
+#[get("/receive_para/{hinmoku_code}")]
+async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
     let setting_file = SettingJson::read();
     let machine_para = setting_file.machine_name;
     let address = Config::get_my_ip_address();
+    let hinmoku_code = hinmoku_code.into_inner();
 
     let dir = std::fs::read_dir("NOKENV").unwrap();
     let mut is_para = false;
@@ -64,7 +65,7 @@ async fn receive_para(hinmoku_code:&str)->Json<ParaInfo> {
     for dir_entry_result in dir {
         let dir_entry = dir_entry_result.unwrap();
         let file_name = dir_entry.file_name().into_string().unwrap_or_default();
-        match file_name.find(hinmoku_code){
+        match file_name.find(&hinmoku_code){
             Some(_) =>  {
                 is_para = true;
                 target_file_name = file_name;
@@ -74,16 +75,21 @@ async fn receive_para(hinmoku_code:&str)->Json<ParaInfo> {
         };
     }
 
-    rocket::serde::json::Json(
-        ParaInfo::new(hinmoku_code,&target_file_name,ParaKind::Hyomen,&machine_para) 
-    )
+    let para_info = ParaInfo::new(
+        &hinmoku_code,
+        &target_file_name,
+        ParaKind::Hyomen,
+        &machine_para
+    );
+    
+    HttpResponse::Ok().json(para_info)
 
 }
 
 
 
-#[post("/post_para",data="<para_info>")]
-async fn post_para(para_info:Json<ParaInfo>){
+#[post("/post_para")]
+async fn post_para(para_info:web::Json<ParaInfo>)->HttpResponse{
     let para_obj = para_info.0;
     let setting_content = SettingJson::read();
     match para_obj.para_kind {
@@ -101,19 +107,24 @@ async fn post_para(para_info:Json<ParaInfo>){
     ParaHistoryJson::init();
     ParaHistoryJson::write(&para_obj);
     
-    println!("{:?}",para_obj.file_name);
+    HttpResponse::Ok().json(para_obj)
 }
 
-#[rocket::main]
-async fn main() -> Result<(),rocket::Error> {
+#[actix_web::main]
+async fn main() -> anyhow::Result<()> {
     match SettingJson::is_file(){
-        true => {rocket::build()
-            .mount("/", routes![index])
-            .mount("/", routes![post_para])
-            .mount("/", routes![check_para])
-            .mount("/", routes![receive_para])
-            .launch().await?;}
-
+        true => {
+            HttpServer::new(||{
+                App::new()
+                .service(index)
+                .service(post_para)
+                .service(check_para)
+                .service(receive_para)
+            })
+            .bind(("127.0.0.1",8080))?
+            .run()
+            .await?
+            }
         false => {
             SettingJson::init();
             println!("{}がありません。初期設定を行いました。",SETTING_JSON_PATH);

@@ -1,9 +1,8 @@
 [workspace]
 members = [ 
     "library", 
-    "para_porter_client",
-    "para_porter_server", "para_seeker", 
-    "para_seeker",
+    "para_porter_server", 
+    "para_seeker", 
 ]
 resolver = "2"
 
