@@ -5,16 +5,20 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug,Deserialize,Serialize)]
 pub struct ShiftjisFile {
+    pub file_path:String,
     pub file_name:String,
     pub utf8_content:String,
 }
 
 
 impl ShiftjisFile {
-    pub fn new(file_name:&str)->Self{
-        let file_data = std::fs::read(file_name).unwrap();
+    pub fn new(dir_path:&str,file_name:&str)->Self{
+        println!("file_name:{:?}",file_name);
+        let file_path = std::path::Path::new(dir_path).join(file_name);
+        let file_data = std::fs::read(&file_path).unwrap();
         let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);
-        Self { 
+        Self {
+            file_path:file_path.to_str().unwrap().to_string(),
             file_name:file_name.to_string(), 
             utf8_content:cow.to_string(),
         }
@@ -34,8 +38,8 @@ pub struct ParseParaFile{
 }
 
 impl ParseParaFile {
-    pub fn new(file_name:&str)-> Self{
-        let shift_jis_file = ShiftjisFile::new(file_name);
+    pub fn new(dir_path:&str,file_name:&str)-> Self{
+        let shift_jis_file = ShiftjisFile::new(dir_path,file_name);
         let mut insert_hashmap = HashMap::new();        
         let conf = Ini::load_from_str(&shift_jis_file.utf8_content).unwrap();
         for (option_section,properies) in conf.iter(){
@@ -81,6 +85,6 @@ fn shiftjis_test(){
     // println!("{:?}",shift_jis_file);
     // ShiftJisFile::to_utf8(file_name, shift_jis_file)
 
-    let para_file = ParseParaFile::new("NOKENV/CO0013Q9(mh5a0-a).txt");
+    let para_file = ParseParaFile::new("NOKENV","CO0013Q9(mh5a0-a).txt");
     println!("{:?}",para_file.get_kijyu_sunpou());
 }

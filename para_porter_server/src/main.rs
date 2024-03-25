@@ -1,8 +1,9 @@
-// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use library::para_info::{ParaInfo, ParaKind};
+use library::para_info::ParaInfo;
 use library::para_history_json::ParaHistoryJson;
 use library::setting::{SettingJson, SETTING_JSON_PATH,Config};
+use library::common_variable::{ITEM_FOLDER, NOKENV};
 use serde::{Deserialize, Serialize};
 
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
@@ -27,7 +28,7 @@ async fn check_para(hinmoku_code:web::Path<String>)-> impl Responder {
     let address = Config::get_my_ip_address();
     let hinmoku_code = hinmoku_code.into_inner();
 
-    let dir = std::fs::read_dir("NOKENV").unwrap();
+    let dir = std::fs::read_dir(NOKENV).unwrap();
     let mut is_para = false;
     for dir_entry_result in dir {
         let dir_entry = dir_entry_result.unwrap();
@@ -54,12 +55,13 @@ async fn check_para(hinmoku_code:web::Path<String>)-> impl Responder {
 
 #[get("/receive_para/{hinmoku_code}")]
 async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
+    println!("test");
     let setting_file = SettingJson::read();
     let machine_para = setting_file.machine_name;
     let address = Config::get_my_ip_address();
     let hinmoku_code = hinmoku_code.into_inner();
 
-    let dir = std::fs::read_dir("NOKENV").unwrap();
+    let dir = std::fs::read_dir(ITEM_FOLDER).unwrap();
     let mut is_para = false;
     let mut target_file_name = String::new();
     for dir_entry_result in dir {
@@ -68,6 +70,7 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
         match file_name.find(&hinmoku_code){
             Some(_) =>  {
                 is_para = true;
+                println!("file_name:{},",file_name);
                 target_file_name = file_name;
                 break;
             },
@@ -77,9 +80,9 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
 
     let para_info = ParaInfo::new(
         &hinmoku_code,
+        ITEM_FOLDER,
         &target_file_name,
-        ParaKind::Hyomen,
-        &machine_para
+        &machine_para,
     );
     
     HttpResponse::Ok().json(para_info)
@@ -92,18 +95,7 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
 async fn post_para(para_info:web::Json<ParaInfo>)->HttpResponse{
     let para_obj = para_info.0;
     let setting_content = SettingJson::read();
-    match para_obj.para_kind {
-        ParaKind::Bariga => {
-            para_obj.write_file(&setting_content.bariga_folder_path);
-            
-        },
-        ParaKind::Hyomen => {
-            para_obj.write_file(&setting_content.omote_folder_path);
-            para_obj.write_file(&setting_content.ura_folder_path);
-
-        },
-    };
-    
+    para_obj.write_file(&setting_content.bariga_folder_path);
     ParaHistoryJson::init();
     ParaHistoryJson::write(&para_obj);
     

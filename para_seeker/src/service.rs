@@ -1,9 +1,9 @@
 use library::encode_shift_jis::ParseParaFile;
 use dialoguer::Select;
 use dialoguer::Confirm;
+use library::common_variable::NOKENV;
 
 
-const NOKENV:&str = "NOKENV";
 
 pub fn see_my_folder(){
     let mut find_files = vec![];
@@ -15,7 +15,7 @@ pub fn see_my_folder(){
         if find_number > 0{
             // println!("file_name:{:?},find_number{:?}",file_name,find_number);
             let file_path = std::path::Path::new(NOKENV).join(file_name);
-            let parse_file = ParseParaFile::new(&file_path.to_str().unwrap());
+            let parse_file = ParseParaFile::new(NOKENV,&file_path.to_str().unwrap());
             let sunpo= parse_file.get_kijyu_sunpou();
             find_files.push(sunpo)
         }
