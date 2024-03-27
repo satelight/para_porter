@@ -3,7 +3,6 @@
 use library::para_info::ParaInfo;
 use library::para_history_json::ParaHistoryJson;
 use library::setting::{SettingJson, SETTING_JSON_PATH,Config};
-use library::common_variable::{ITEM_FOLDER, NOKENV};
 use serde::{Deserialize, Serialize};
 
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
@@ -21,70 +20,14 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body("hello!! para porter site")
 }
 
-#[get("/check_para/{hinmoku_code}")]
-async fn check_para(hinmoku_code:web::Path<String>)-> impl Responder {
-    let setting_file = SettingJson::read();
-    let machine_para = setting_file.machine_name;
-    let address = Config::get_my_ip_address();
-    let hinmoku_code = hinmoku_code.into_inner();
-
-    let dir = std::fs::read_dir(NOKENV).unwrap();
-    let mut is_para = false;
-    for dir_entry_result in dir {
-        let dir_entry = dir_entry_result.unwrap();
-        let file_name = dir_entry.file_name().into_string().unwrap_or_default();
-        match file_name.find(&hinmoku_code){
-            Some(_) =>  {
-                is_para = true;
-                break;
-            },
-            None => {},
-        };
-    }
-
-    HttpResponse::Ok().json(
-        CheckPara {
-            hinmoku_code:hinmoku_code.to_string(),
-            machine_para,
-            address,
-            is_para,
-        }
-    )
-
-}
 
 #[get("/receive_para/{hinmoku_code}")]
 async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
-    println!("test");
     let setting_file = SettingJson::read();
     let machine_para = setting_file.machine_name;
     let address = Config::get_my_ip_address();
     let hinmoku_code = hinmoku_code.into_inner();
-
-    let dir = std::fs::read_dir(ITEM_FOLDER).unwrap();
-    let mut is_para = false;
-    let mut target_file_name = String::new();
-    for dir_entry_result in dir {
-        let dir_entry = dir_entry_result.unwrap();
-        let file_name = dir_entry.file_name().into_string().unwrap_or_default();
-        match file_name.find(&hinmoku_code){
-            Some(_) =>  {
-                is_para = true;
-                println!("file_name:{},",file_name);
-                target_file_name = file_name;
-                break;
-            },
-            None => {},
-        };
-    }
-
-    let para_info = ParaInfo::new(
-        &hinmoku_code,
-        ITEM_FOLDER,
-        &target_file_name,
-        &machine_para,
-    );
-    
+    let para_info = ParaInfo::new(&hinmoku_code,&machine_para,&address);
     HttpResponse::Ok().json(para_info)
 
 }
@@ -94,8 +37,7 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
 #[post("/post_para")]
 async fn post_para(para_info:web::Json<ParaInfo>)->HttpResponse{
     let para_obj = para_info.0;
-    let setting_content = SettingJson::read();
-    para_obj.write_file(&setting_content.bariga_folder_path);
+    para_obj.write_file();
     ParaHistoryJson::init();
     ParaHistoryJson::write(&para_obj);
     
@@ -110,7 +52,6 @@ async fn main() -> anyhow::Result<()> {
                 App::new()
                 .service(index)
                 .service(post_para)
-                .service(check_para)
                 .service(receive_para)
             })
             .bind(("127.0.0.1",8080))?

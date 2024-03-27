@@ -982,6 +982,7 @@ dependencies = [
  "rust-ini",
  "serde",
  "serde_json",
+ "string_py 0.2.0",
 ]
 
 [[package]]
@@ -1221,7 +1222,7 @@ dependencies = [
  "library",
  "serde",
  "serde_json",
- "string_py",
+ "string_py 0.1.0",
 ]
 
 [[package]]
@@ -1236,7 +1237,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
- "string_py",
+ "string_py 0.1.0",
  "tokio",
 ]
 
@@ -1656,6 +1657,12 @@ name = "string_py"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd9e02ef2cbb9414cd7ec8fdaa77cb5dc3e2355d4e5a6688be45cbfa2e43e8c5"
+
+[[package]]
+name = "string_py"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b5cf3aaefa992a6980f14741a0c153f783b2d0021fc184fafbffc102c21ee56"
 
 [[package]]
 name = "syn"

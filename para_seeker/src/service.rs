@@ -1,21 +1,22 @@
 use library::encode_shift_jis::ParseParaFile;
+#[allow(unused_imports)]
 use dialoguer::Select;
 use dialoguer::Confirm;
-use library::common_variable::NOKENV;
+use library::common_variable::BARIGA_FOLDER_PATH;
 
 
 
 pub fn see_my_folder(){
     let mut find_files = vec![];
-    let dir = std::fs::read_dir(NOKENV).unwrap();
+    let dir = std::fs::read_dir(BARIGA_FOLDER_PATH).unwrap();
     for d_result in dir {
         let dir_entry = d_result.unwrap();
         let file_name = dir_entry.file_name().to_str().unwrap().to_string();
         let find_number = file_name.find(".txt").unwrap_or(0);
         if find_number > 0{
             // println!("file_name:{:?},find_number{:?}",file_name,find_number);
-            let file_path = std::path::Path::new(NOKENV).join(file_name);
-            let parse_file = ParseParaFile::new(NOKENV,&file_path.to_str().unwrap());
+            let file_path = std::path::Path::new(BARIGA_FOLDER_PATH).join(file_name);
+            let parse_file = ParseParaFile::new(BARIGA_FOLDER_PATH,&file_path.to_str().unwrap());
             let sunpo= parse_file.get_kijyu_sunpou();
             find_files.push(sunpo)
         }
@@ -44,8 +45,8 @@ pub fn see_my_folder(){
 
 }
 
-
-pub fn is_there_the_para_file(file_name:&str){
+#[allow(dead_code)]
+pub fn is_there_the_para_file(_file_name:&str){
 
 }
 

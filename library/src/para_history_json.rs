@@ -57,7 +57,7 @@ impl ParaHistoryJson {
         json_content.insert(
             para_info.hinmoku_code.clone(),
             ParaHistoryInfo::new(
-                &para_info.file_name,
+                &para_info.bariga_file_name,
                 para_info.update_time_unix_seconds,
                 &para_info.machine_name,
             ),
