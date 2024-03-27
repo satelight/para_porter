@@ -23,16 +23,6 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
 
 }
 
-#[post("/post_para")]
-async fn post_para(para_info:web::Json<ParaInfo>)->HttpResponse{
-    let para_obj = para_info.0;
-    para_obj.write_file();
-    ParaHistoryJson::init();
-    ParaHistoryJson::write(&para_obj);
-    
-    HttpResponse::Ok().json(para_obj)
-}
-
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
     match SettingJson::is_file(){
@@ -40,10 +30,10 @@ async fn main() -> anyhow::Result<()> {
             HttpServer::new(||{
                 App::new()
                 .service(index)
-                .service(post_para)
                 .service(receive_para)
             })
             .bind(("127.0.0.1",8080))?
+            .workers(2)
             .run()
             .await?
             }
