@@ -4,9 +4,9 @@
 // use console::style;
 
 use anyhow::Ok;
-mod home_menu;
+mod menu;
 mod service;
-use home_menu::{HomeSelectionItem,show_home_menu};
+use menu::{HomeSelectionItem,Menu};
 
 
 
@@ -14,12 +14,13 @@ use home_menu::{HomeSelectionItem,show_home_menu};
 #[tokio::main]
 async fn main()->anyhow::Result<(),anyhow::Error>{
     loop {
-        let select_item = show_home_menu();
+        let select_item = Menu::home().await;
         match select_item {
-            HomeSelectionItem::SeeMyFolder => service::see_my_folder(),
-            HomeSelectionItem::IsThereTheParaFile => {
-                let file_name = "CO0013Q9";
-                service::is_there_the_para_file(file_name);
+            HomeSelectionItem::SearchMyFolder => service::see_my_folder(),
+            HomeSelectionItem::SearchOtherMachine => {
+                let hinmoku_code = Menu::search_hinmoku_menu_1st().await;
+                println!("hinmoku_code:{:?}",hinmoku_code);
+                service::is_there_the_para_file(&hinmoku_code).await;
             },
             HomeSelectionItem::End => break,
             _ => {}

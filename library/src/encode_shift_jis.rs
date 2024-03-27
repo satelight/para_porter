@@ -15,12 +15,20 @@ impl ShiftjisFile {
     pub fn new(dir_path:&str,file_name:&str)->Self{
         println!("file_name:{:?}",file_name);
         let file_path = std::path::Path::new(dir_path).join(file_name);
-        let file_data = std::fs::read(&file_path).unwrap();
-        let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);
-        Self {
-            file_path:file_path.to_str().unwrap().to_string(),
-            file_name:file_name.to_string(), 
-            utf8_content:cow.to_string(),
+        match std::fs::read(&file_path){
+            Ok(file_data) =>{
+                let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);
+                Self {
+                    file_path:file_path.to_str().unwrap().to_string(),
+                    file_name:file_name.to_string(), 
+                    utf8_content:cow.to_string(),
+                }
+            },
+            Err(_) =>Self {
+                file_path:file_path.to_str().unwrap().to_string(),
+                file_name:file_name.to_string(), 
+                utf8_content:String::from(""),
+            }
         }
     }
 
