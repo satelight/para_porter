@@ -3,17 +3,8 @@
 use library::para_info::ParaInfo;
 use library::para_history_json::ParaHistoryJson;
 use library::setting::{SettingJson, SETTING_JSON_PATH,Config};
-use serde::{Deserialize, Serialize};
 
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-
-#[derive(Debug,Serialize,Deserialize)]
-pub struct CheckPara {
-    pub hinmoku_code:String,
-    pub machine_para:String,
-    pub address:String,
-    pub is_para:bool,
-}
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -31,8 +22,6 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
     HttpResponse::Ok().json(para_info)
 
 }
-
-
 
 #[post("/post_para")]
 async fn post_para(para_info:web::Json<ParaInfo>)->HttpResponse{
