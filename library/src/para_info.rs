@@ -32,9 +32,15 @@ impl ParaInfo {
             // バリ画ファイル
             let path = std::path::Path::new(BARIGA_FOLDER_PATH).join(&bariga_file_name);
             let bariga_file = ShiftjisFile::new(BARIGA_FOLDER_PATH,&bariga_file_name);
-            let meta = fs::metadata(&path).unwrap();
-            let mtime = FileTime::from_last_modification_time(&meta);
-            let unix_seconds = mtime.unix_seconds();
+            
+            let mut unix_seconds = 0;
+            match fs::metadata(&path){
+                Ok(meta) => {
+                    let mtime = FileTime::from_last_modification_time(&meta);
+                    unix_seconds = mtime.unix_seconds();
+                },
+                Err(_) => {},
+            };
 
             // 表面ファイル
             let read_dir = std::fs::read_dir(OMOTE_FOLDER_PATH).unwrap();
@@ -69,7 +75,7 @@ impl ParaInfo {
                 hyomen_content,
                 update_time_unix_seconds: unix_seconds, 
                 machine_name:machine_name.to_string(),
-                is_file:true,
+                is_file:bariga_file.is_file,
                 address:address.to_string(),
             }
     }
@@ -84,6 +90,7 @@ impl ParaInfo {
             file_path:written_path.to_str().unwrap().to_string(),
             file_name:self.bariga_file_name.clone(),
             utf8_content:self.bariga_content.clone(),
+            is_file:true,
         };       
         shift_jis_file.write(written_path.to_str().unwrap_or(""));
 
@@ -97,6 +104,7 @@ impl ParaInfo {
                 file_path:written_path.to_str().unwrap().to_string(),
                 file_name:self.hyomen_file_name.clone(),
                 utf8_content:self.hyomen_content.clone(),
+                is_file:true,
             };       
             shift_jis_file.write(written_hyomen_path.to_str().unwrap_or(""));
         }

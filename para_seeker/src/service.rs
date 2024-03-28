@@ -86,7 +86,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     }
 
     for para in para_infos.iter(){
-        println!("{:?}",para.hinmoku_code);
+        println!("{:?}:{}",para.hinmoku_code,para.is_file);
     }
     para_infos
 }

@@ -8,13 +8,13 @@ pub struct ShiftjisFile {
     pub file_path:String,
     pub file_name:String,
     pub utf8_content:String,
+    pub is_file:bool,
 }
 
 
 impl ShiftjisFile {
     pub fn new(dir_path:&str,file_name:&str)->Self{
         let file_path = std::path::Path::new(dir_path).join(file_name);
-        std::fs::read(&file_path).unwrap();
         match std::fs::read(&file_path){
             Ok(file_data) =>{
                 let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);
@@ -22,6 +22,7 @@ impl ShiftjisFile {
                     file_path:file_path.to_str().unwrap().to_string(),
                     file_name:file_name.to_string(), 
                     utf8_content:cow.to_string(),
+                    is_file:true,
                 }
             },
             Err(_) =>{
@@ -29,6 +30,7 @@ impl ShiftjisFile {
                 file_path:file_path.to_str().unwrap().to_string(),
                 file_name:file_name.to_string(), 
                 utf8_content:String::from(""),
+                is_file:false,
             }}
         }
     }
