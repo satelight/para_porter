@@ -12,7 +12,7 @@ async fn index() -> impl Responder {
 
 #[get("/receive_para/{hinmoku_code}")]
 async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
-    let setting_file = SettingJson::read();
+    let setting_file = SettingJson::read(true);
     let machine_para = setting_file.machine_name;
     let address = Config::get_my_ip_address();
     let hinmoku_code = hinmoku_code.into_inner();
@@ -23,7 +23,7 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
 
 #[get("/tell_friends")]
 async fn tell_friends(hinmoku_code:web::Path<String>)-> HttpResponse {
-    let setting_file = SettingJson::read();
+    let setting_file = SettingJson::read(true);
     let machine_para = setting_file.machine_name;
     let address = Config::get_my_ip_address();
     let hinmoku_code = hinmoku_code.into_inner();

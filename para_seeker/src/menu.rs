@@ -43,10 +43,10 @@ impl Menu {
         .interact_text()
         .unwrap();
 
-        String::from(name)
+        name
     }
 
-
+    #[allow(dead_code)]
     pub async fn search_hinmoku_menu_2nd()-> String{
         //　選んだら、そのデータを反映させる。
     // バリ画、表、裏、表側のItemMaster.INIと裏のItemMaster.INIに書き込む。

@@ -55,15 +55,12 @@ impl ParseParaFile {
         let conf = Ini::load_from_str(&shift_jis_file.utf8_content).unwrap();
         for (option_section,properies) in conf.iter(){
             let mut hash_content = HashMap::new();
-            match option_section {
-                Some(section_name) => {
-                    for (key,value) in properies.iter(){
-                        hash_content.insert(key.to_string(), value.to_string());
-                    }
-                    insert_hashmap.insert(section_name.to_string(), hash_content);
-                },
-                None => {}
-            }
+            if let Some(section_name) = option_section {
+                for (key,value) in properies.iter(){
+                    hash_content.insert(key.to_string(), value.to_string());
+                }
+                insert_hashmap.insert(section_name.to_string(), hash_content);
+            };
         }
         
         // insert_hashmap.insert(k, v)

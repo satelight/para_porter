@@ -40,7 +40,9 @@ impl SettingJson {
 
     }
 
-    pub fn read()-> Self {
+    pub fn read(init_ok:bool)-> Self {
+        if init_ok {SettingJson::init();}
+
         let setting_folder = std::path::Path::new(SETTING_DIR_PATH);
         let setting_json_path = setting_folder.join(SETTING_JSON_PATH);
 

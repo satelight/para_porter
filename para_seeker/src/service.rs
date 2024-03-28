@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use library::encode_shift_jis::ParseParaFile;
 #[allow(unused_imports)]
 use dialoguer::Select;
@@ -15,16 +13,10 @@ pub fn see_my_folder(){
             for d_result in dir {
                 let dir_entry = d_result.unwrap();
                 let file_name = dir_entry.file_name().to_str().unwrap().to_string();
-                match file_name.find(".txt"){
-                    Some(_) => {
-                        // println!("file_name:{:?},find_number{:?}",file_name,find_number);
-                        let parse_file = ParseParaFile::new(OMOTE_FOLDER_PATH,&file_name);
-                        match parse_file.get_kijyu_sunpou(){
-                            Some(sunpo) => find_files.push(sunpo),
-                            None => {},
-                        }
-                    },
-                    None =>{},
+                if file_name.contains(".txt"){
+                    // println!("file_name:{:?},find_number{:?}",file_name,find_number);
+                    let parse_file = ParseParaFile::new(OMOTE_FOLDER_PATH,&file_name);
+                    if let Some(sunpo) = parse_file.get_kijyu_sunpou(){find_files.push(sunpo)};
                 };
             }
             
@@ -56,8 +48,10 @@ pub fn see_my_folder(){
 pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     let mut para_infos:Vec<ParaInfo> = vec![];  
     // setting.jsonから他の設備のIPアドレスを取得。
-    // let setting_json = SettingJson::read();
-    // let friend_ips = setting_json.friend_ips; 
+    let setting_json = SettingJson::read(true);
+    let friend_ips = setting_json.friend_ips; 
+    println!("{:?}",friend_ips);
+    
     let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
     // let hinmoku_code_arc = Arc::new(hinmoku_code);
 
@@ -71,7 +65,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
             let url = format!("http://{}:8080/receive_para/{}",url,hinmoku_code.clone());
             let response_string = reqwest::get(&url).await.unwrap().text().await.unwrap();
             let res:ParaInfo = serde_json::from_str(&response_string).unwrap();
-            return res;    
+            res    
         });
         
         handlers.push(handler);
@@ -79,10 +73,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     
     for handler in handlers {
         // 問い合わせたデータをvecで追加していく。
-        match handler.await{
-            Ok(para_info) => para_infos.push(para_info),
-            Err(_) => {},
-        }
+        if let Ok(para_info) =  handler.await{para_infos.push(para_info)}
     }
 
     for para in para_infos.iter(){

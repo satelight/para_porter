@@ -34,12 +34,9 @@ impl ParaInfo {
             let bariga_file = ShiftjisFile::new(BARIGA_FOLDER_PATH,&bariga_file_name);
             
             let mut unix_seconds = 0;
-            match fs::metadata(&path){
-                Ok(meta) => {
-                    let mtime = FileTime::from_last_modification_time(&meta);
-                    unix_seconds = mtime.unix_seconds();
-                },
-                Err(_) => {},
+            if let Ok(meta) = fs::metadata(path){
+                let mtime = FileTime::from_last_modification_time(&meta);
+                unix_seconds = mtime.unix_seconds();
             };
 
             // 表面ファイル
@@ -51,13 +48,9 @@ impl ParaInfo {
                 let original_file_name = dir_entry.file_name().to_str().unwrap().to_string();
                 let upper_case_file_name = original_file_name.clone().to_uppercase();
 
-                match upper_case_file_name.find(&hyomen_target_hinmoku){
-                    Some(_) => {
-                        
-                        hyomen_file_name = original_file_name;
-                        break;
-                    },
-                    None => {},
+                if upper_case_file_name.contains(&hyomen_target_hinmoku){
+                    hyomen_file_name = original_file_name;
+                    break;
                 }
             }
 

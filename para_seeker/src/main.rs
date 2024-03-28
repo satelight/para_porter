@@ -19,8 +19,8 @@ async fn main()->anyhow::Result<(),anyhow::Error>{
             HomeSelectionItem::SearchMyFolder => service::see_my_folder(),
             HomeSelectionItem::SearchOtherMachine => {
                 let hinmoku_code = Menu::search_hinmoku_menu_1st().await;
-                let response = service::is_there_the_para_file(&hinmoku_code.trim()).await;
-                
+                let _response = service::is_there_the_para_file(hinmoku_code.trim()).await;
+                // println!("{:?}",response);
             },
             HomeSelectionItem::End => break,
         }
