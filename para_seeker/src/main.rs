@@ -1,7 +1,9 @@
-// use std::thread;
-// use std::time::Duration;
-// use console::Term;
-// use console::style;
+/// TODO：
+/// 表裏、ItemMaster.INIファイルの更新
+/// バリ、表、裏にファイルの書き込み
+/// 各設備にリクエスト処理する前に自分のアドレスに聞いてみてあったら、既にあることを伝える。
+/// 他の設備が持っているIPアドレスもついでに取得する。
+///　全てのコメント書き
 
 use anyhow::Ok;
 mod menu;
