@@ -1,12 +1,12 @@
-use std::f32::consts::E;
+use std::sync::Arc;
 
 use library::encode_shift_jis::ParseParaFile;
 #[allow(unused_imports)]
 use dialoguer::Select;
 use dialoguer::Confirm;
 use library::common_variable::OMOTE_FOLDER_PATH;
-
-
+use library::para_info::ParaInfo;
+use library::setting::SettingJson;
 
 pub fn see_my_folder(){
     let mut find_files = vec![];
@@ -18,10 +18,11 @@ pub fn see_my_folder(){
                 match file_name.find(".txt"){
                     Some(_) => {
                         // println!("file_name:{:?},find_number{:?}",file_name,find_number);
-                        let file_path = std::path::Path::new(OMOTE_FOLDER_PATH).join(file_name);
-                        let parse_file = ParseParaFile::new(OMOTE_FOLDER_PATH,&file_path.to_str().unwrap());
-                        let sunpo= parse_file.get_kijyu_sunpou();
-                        return find_files.push(sunpo);
+                        let parse_file = ParseParaFile::new(OMOTE_FOLDER_PATH,&file_name);
+                        match parse_file.get_kijyu_sunpou(){
+                            Some(sunpo) => find_files.push(sunpo),
+                            None => {},
+                        }
                     },
                     None =>{},
                 };
@@ -51,15 +52,41 @@ pub fn see_my_folder(){
 
 }
 
-#[allow(dead_code)]
-pub async fn is_there_the_para_file(_hinmoku_code:&str){
+
+pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
+    let mut para_infos:Vec<ParaInfo> = vec![];  
     // setting.jsonから他の設備のIPアドレスを取得。
+    // let setting_json = SettingJson::read();
+    // let friend_ips = setting_json.friend_ips; 
+    let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
+    // let hinmoku_code_arc = Arc::new(hinmoku_code);
+
     // http://取得したIPアドレス/receive_para/{hinmoku_code}
     // reqwest.getでコピーしたい品目がないか問い合わせ（並列処理）。
-    // 問い合わせたデータをvecで追加していく。
-    // 更新時間が新しいものを最初にする。
-    // どのデータを利用するかを選べるように一覧にする。
-    //　選んだら、そのデータを反映させる。
-    // バリ画、表、裏、表側のItemMaster.INIと裏のItemMaster.INIに書き込む。
-    // 終了
+    let mut handlers =vec![]; 
+    
+    for url in friend_ips.clone() {
+        let hinmoku_code = String::from(hinmoku_code);
+        let handler = tokio::spawn(async move {
+            let url = format!("http://{}:8080/receive_para/{}",url,hinmoku_code.clone());
+            let response_string = reqwest::get(&url).await.unwrap().text().await.unwrap();
+            let res:ParaInfo = serde_json::from_str(&response_string).unwrap();
+            return res;    
+        });
+        
+        handlers.push(handler);
+    }
+    
+    for handler in handlers {
+        // 問い合わせたデータをvecで追加していく。
+        match handler.await{
+            Ok(para_info) => para_infos.push(para_info),
+            Err(_) => {},
+        }
+    }
+
+    for para in para_infos.iter(){
+        println!("{:?}",para.hinmoku_code);
+    }
+    para_infos
 }

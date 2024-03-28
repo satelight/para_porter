@@ -13,8 +13,8 @@ pub struct ShiftjisFile {
 
 impl ShiftjisFile {
     pub fn new(dir_path:&str,file_name:&str)->Self{
-        println!("file_name:{:?}",file_name);
         let file_path = std::path::Path::new(dir_path).join(file_name);
+        std::fs::read(&file_path).unwrap();
         match std::fs::read(&file_path){
             Ok(file_data) =>{
                 let (cow,_,_) = encoding_rs::SHIFT_JIS.decode(&file_data);
@@ -24,11 +24,12 @@ impl ShiftjisFile {
                     utf8_content:cow.to_string(),
                 }
             },
-            Err(_) =>Self {
+            Err(_) =>{
+                Self {
                 file_path:file_path.to_str().unwrap().to_string(),
                 file_name:file_name.to_string(), 
                 utf8_content:String::from(""),
-            }
+            }}
         }
     }
 
@@ -46,7 +47,7 @@ pub struct ParseParaFile{
 }
 
 impl ParseParaFile {
-    pub fn new(dir_path:&str,file_name:&str)-> Self{
+    pub fn new(dir_path:&str,file_name:&str)->Self{
         let shift_jis_file = ShiftjisFile::new(dir_path,file_name);
         let mut insert_hashmap = HashMap::new();        
         let conf = Ini::load_from_str(&shift_jis_file.utf8_content).unwrap();
@@ -67,13 +68,17 @@ impl ParseParaFile {
         Self { file_name: file_name.to_string(), content:insert_hashmap }
     }
 
-    pub fn get_kijyu_sunpou(&self)->Sunpo{
-        let hash_map:HashMap<String,String> = self.content.get("基準寸法").unwrap().clone();
-        let naikei = hash_map.get("内径基準値").unwrap().parse::<f32>().unwrap();
-        let gaikei = hash_map.get("外径基準値").unwrap().parse::<f32>().unwrap();
-        let hutosa = hash_map.get("リング幅基準値").unwrap().parse::<f32>().unwrap();
+    pub fn get_kijyu_sunpou(&self)-> Option<Sunpo>{
+        if self.content.is_empty() {
+            None
+        }else {    
+            let hash_map:HashMap<String,String> = self.content.get("基準寸法")?.clone();
+            let naikei = hash_map.get("内径基準値")?.parse::<f32>().unwrap_or(0.0);
+            let gaikei = hash_map.get("外径基準値")?.parse::<f32>().unwrap_or(0.0);
+            let hutosa = hash_map.get("リング幅基準値")?.parse::<f32>().unwrap_or(0.0);
+            Some(Sunpo { file_path:self.file_name.clone(), naikei, gaikei, hutosa})
+        }
 
-        Sunpo { file_path:self.file_name.clone(), naikei, gaikei, hutosa}
     }
 }
 

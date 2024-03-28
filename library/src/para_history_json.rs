@@ -6,14 +6,14 @@ use std::{collections::HashMap, iter::zip};
 const SETTING_FOLDER: &str = "setting";
 
 /// パラメータのメタ情報一覧を保存するpara_history.jsonのパス
-const PARAMETA_JSON: &str = "para_history.json";
+const HISTORY_JSON: &str = "para_history.json";
 
 pub struct ParaHistoryJson;
 
 impl ParaHistoryJson {
     pub fn init() {
         let folder_path = std::path::Path::new(SETTING_FOLDER);
-        let file_path = folder_path.join(PARAMETA_JSON);
+        let file_path = folder_path.join(HISTORY_JSON);
         if !file_path.exists() {
             let f = std::fs::File::create(&file_path).unwrap();
             let mut content = HashMap::new();
@@ -47,7 +47,7 @@ impl ParaHistoryJson {
 
     pub fn read() -> ParaHistoryContent {
         let folder_path = std::path::Path::new(SETTING_FOLDER);
-        let file_path = folder_path.join(PARAMETA_JSON);
+        let file_path = folder_path.join(HISTORY_JSON);
         let rdr = std::fs::File::open(file_path).unwrap();
         serde_json::from_reader(rdr).unwrap()
     }
@@ -63,7 +63,7 @@ impl ParaHistoryJson {
             ),
         );
         let folder_path = std::path::Path::new(SETTING_FOLDER);
-        let file_path = folder_path.join(PARAMETA_JSON);
+        let file_path = folder_path.join(HISTORY_JSON);
         let f = std::fs::File::create(file_path).unwrap();
         serde_json::to_writer_pretty(f, &json_content).unwrap();
     }

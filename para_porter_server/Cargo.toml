@@ -9,5 +9,5 @@ serde.workspace = true
 serde_json.workspace = true
 chrono.workspace = true
 string_py.workspace = true
+anyhow.workspace = true
 actix-web = "4"
-anyhow = "1.0.81"
