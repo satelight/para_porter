@@ -24,9 +24,9 @@ pub struct ParaInfo {
 
 impl ParaInfo {
     pub fn new(hinmoku_code:&str,machine_name:&str,address:&str) -> Self{
-            let mut bariga_file_name = String::from(hinmoku_code);
+            let mut bariga_file_name = String::from(hinmoku_code).to_uppercase();
             bariga_file_name.push_str(".txt");
-            let bariga_file_name = bariga_file_name.to_ascii_uppercase();
+            let bariga_file_name = bariga_file_name.clone();
             let hyomen_target_hinmoku = StrLikePy::new(hinmoku_code);
             let hyomen_target_hinmoku = hyomen_target_hinmoku.slice(0,-1);
             // バリ画ファイル

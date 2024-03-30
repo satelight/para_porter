@@ -4,11 +4,7 @@ pub const SETTING_JSON_PATH:&str = "setting.json";
 #[derive(Debug,serde::Serialize,serde::Deserialize)]
 pub struct SettingJson{
     pub machine_name:String,
-    pub bariga_folder_path:String,
-    pub omote_folder_path:String,
-    pub ura_folder_path:String,
     pub friend_ips:Vec<String>,
-    pub no_target_hinmoku_code:Vec<String>,
 }
 
 
@@ -28,11 +24,7 @@ impl SettingJson {
             let f = std::fs::File::create(setting_json_path).unwrap();
             let setting_file:SettingJson = SettingJson { 
                 machine_name:"DV999".to_string(),
-                bariga_folder_path: "D:/Item".to_string(), 
-                omote_folder_path:"D:/NOKENV/".to_string(), 
-                ura_folder_path: "P:/NOKENV/".to_string(),
                 friend_ips: vec![],
-                no_target_hinmoku_code:vec![],
             };
 
             serde_json::to_writer_pretty(f, &setting_file).unwrap();

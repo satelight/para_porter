@@ -8,6 +8,7 @@
 use anyhow::Ok;
 mod menu;
 mod service;
+use library::common_variable::{BARIGA_FOLDER_PATH, OMOTE_FOLDER_PATH, URA_FOLDER_PATH};
 use menu::{HomeSelectionItem,Menu};
 
 
@@ -19,11 +20,43 @@ async fn main()->anyhow::Result<(),anyhow::Error>{
         let select_item = Menu::home().await;
         match select_item {
             HomeSelectionItem::SearchMyFolder => service::see_my_folder(),
+
             HomeSelectionItem::SearchOtherMachine => {
                 let hinmoku_code = Menu::search_hinmoku_menu_1st().await;
-                let _response = service::is_there_the_para_file(hinmoku_code.trim()).await;
-                // println!("{:?}",response);
+                
+                let para_infos = service::is_there_the_para_file(hinmoku_code.trim()).await;
+                
+                let option_selected_para_info = Menu::search_hinmoku_menu_2nd(&para_infos).await;
+                
+                match option_selected_para_info {
+                    Some(selected_para_info) => {
+                        let process_result = service::put_files_several_folder(&selected_para_info).await;
+                        println!("設備名:{}のファイルを基に以下に保存しました。",selected_para_info.machine_name);
+                        
+                        if process_result.bariga{
+                            println!("バリ画ファイル:{}/{}に保存しました。",BARIGA_FOLDER_PATH,selected_para_info.bariga_file_name);
+                        } else {
+                            println!("バリ画ファイル:{}/{}に保存に失敗しました。",BARIGA_FOLDER_PATH,selected_para_info.bariga_file_name);
+                        }
+
+                        if process_result.omote {
+                            println!("表表面ファイル:{}/{}に保存しました。",OMOTE_FOLDER_PATH,selected_para_info.bariga_file_name);
+                        }else {
+                            println!("表表面ファイル:{}/{}に保存に失敗しました。",OMOTE_FOLDER_PATH,selected_para_info.bariga_file_name);
+
+                        }
+
+                        if process_result.ura {
+                            println!("裏表面ファイル:{}/{}に保存しました。",URA_FOLDER_PATH,selected_para_info.bariga_file_name);
+                        }else {
+                            println!("裏表面ファイル:{}/{}に保存に失敗しました。",URA_FOLDER_PATH,selected_para_info.bariga_file_name);
+
+                        }
+                    },
+                    None => {println!("{}のファイルが存在していません。",hinmoku_code);}
+                }
             },
+
             HomeSelectionItem::End => break,
         }
     }

@@ -1,10 +1,13 @@
+use std::path::Path;
+
 use library::encode_shift_jis::ParseParaFile;
 #[allow(unused_imports)]
 use dialoguer::Select;
 use dialoguer::Confirm;
-use library::common_variable::OMOTE_FOLDER_PATH;
+use library::common_variable::{BARIGA_FOLDER_PATH, OMOTE_FOLDER_PATH,URA_FOLDER_PATH};
 use library::para_info::ParaInfo;
 use library::setting::SettingJson;
+use library::encode_shift_jis::ShiftjisFile;
 
 pub fn see_my_folder(){
     let mut find_files = vec![];
@@ -50,7 +53,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     // setting.jsonから他の設備のIPアドレスを取得。
     let setting_json = SettingJson::read(true);
     let friend_ips = setting_json.friend_ips; 
-    println!("{:?}",friend_ips);
+    println!("service.rs_53:setting_json.friend_ips:{:?}",friend_ips);
     
     let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
     // let hinmoku_code_arc = Arc::new(hinmoku_code);
@@ -77,7 +80,54 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     }
 
     for para in para_infos.iter(){
-        println!("{:?}:{}",para.hinmoku_code,para.is_file);
+        println!("service.rs_80:{:?}:{}",para.hinmoku_code,para.is_file);
     }
     para_infos
+}
+
+#[derive(Debug)]
+pub struct WriteResult{
+    pub bariga:bool,
+    pub omote:bool,
+    pub ura:bool,
+}
+
+impl WriteResult{
+    pub fn new_as_all_false()->Self{
+        Self { bariga: false, omote: false, ura: false }
+    }
+}
+
+
+pub async fn put_files_several_folder(selected_para_info:&ParaInfo)->WriteResult{
+    let mut write_result = WriteResult::new_as_all_false();
+    let bariga_file_name = &selected_para_info.bariga_file_name;
+    let hyomen_file_name = &selected_para_info.hyomen_file_name;
+    let bariga_path = Path::new(BARIGA_FOLDER_PATH).join(bariga_file_name);
+    let omote_path = Path::new(OMOTE_FOLDER_PATH).join(hyomen_file_name);
+    let ura_path = Path::new(URA_FOLDER_PATH).join(hyomen_file_name);
+
+    if let true = bariga_path.exists() {
+        let bariga_shift_jis_file = ShiftjisFile::new(BARIGA_FOLDER_PATH,&bariga_file_name);
+        bariga_shift_jis_file.write(bariga_path.to_str().unwrap());
+        write_result.bariga = true;
+    }
+
+    if let true = omote_path.exists() {
+        let bariga_shift_jis_file = ShiftjisFile::new(OMOTE_FOLDER_PATH,&hyomen_file_name);
+        bariga_shift_jis_file.write(omote_path.to_str().unwrap());
+        write_result.omote = true;
+
+    }
+
+    if let true = bariga_path.exists() {
+        let bariga_shift_jis_file = ShiftjisFile::new(URA_FOLDER_PATH,&hyomen_file_name);
+        bariga_shift_jis_file.write(ura_path.to_str().unwrap());
+        write_result.ura = true;
+    }
+
+    write_result
+
+
+
 }
