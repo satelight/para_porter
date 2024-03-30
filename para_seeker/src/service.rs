@@ -52,9 +52,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     let mut para_infos:Vec<ParaInfo> = vec![];  
     // setting.jsonから他の設備のIPアドレスを取得。
     let setting_json = SettingJson::read(true);
-    let friend_ips = setting_json.friend_ips; 
-    println!("service.rs_53:setting_json.friend_ips:{:?}",friend_ips);
-    
+    let friend_ips = setting_json.friend_ips;  
     let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
     // let hinmoku_code_arc = Arc::new(hinmoku_code);
 
@@ -70,17 +68,16 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
             let res:ParaInfo = serde_json::from_str(&response_string).unwrap();
             res    
         });
-        
         handlers.push(handler);
     }
     
     for handler in handlers {
         // 問い合わせたデータをvecで追加していく。
-        if let Ok(para_info) =  handler.await{para_infos.push(para_info)}
-    }
-
-    for para in para_infos.iter(){
-        println!("service.rs_80:{:?}:{}",para.hinmoku_code,para.is_file);
+        if let Ok(para_info) =  handler.await{
+            if para_info.is_file{
+                para_infos.push(para_info)
+            }
+        }
     }
     para_infos
 }
@@ -107,11 +104,11 @@ pub async fn put_files_several_folder(selected_para_info:&ParaInfo)->WriteResult
     let omote_path = Path::new(OMOTE_FOLDER_PATH).join(hyomen_file_name);
     let ura_path = Path::new(URA_FOLDER_PATH).join(hyomen_file_name);
 
-    if let true = bariga_path.exists() {
+    // if let true = bariga_path.exists() {
         let bariga_shift_jis_file = ShiftjisFile::new(BARIGA_FOLDER_PATH,&bariga_file_name);
         bariga_shift_jis_file.write(bariga_path.to_str().unwrap());
         write_result.bariga = true;
-    }
+    // }
 
     if let true = omote_path.exists() {
         let bariga_shift_jis_file = ShiftjisFile::new(OMOTE_FOLDER_PATH,&hyomen_file_name);

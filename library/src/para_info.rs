@@ -1,7 +1,7 @@
 use std::path::Path;
 use filetime::FileTime;
 use std::fs;
-use string_py::StrLikePy;
+use string_py::EasyString;
 
 use super::encode_shift_jis::ShiftjisFile;
 use super::common_variable::{OMOTE_FOLDER_PATH,BARIGA_FOLDER_PATH,URA_FOLDER_PATH};
@@ -27,7 +27,7 @@ impl ParaInfo {
             let mut bariga_file_name = String::from(hinmoku_code).to_uppercase();
             bariga_file_name.push_str(".txt");
             let bariga_file_name = bariga_file_name.clone();
-            let hyomen_target_hinmoku = StrLikePy::new(hinmoku_code);
+            let hyomen_target_hinmoku = EasyString::new(hinmoku_code);
             let hyomen_target_hinmoku = hyomen_target_hinmoku.slice(0,-1);
             // バリ画ファイル
             let path = std::path::Path::new(BARIGA_FOLDER_PATH).join(&bariga_file_name);
@@ -75,31 +75,33 @@ impl ParaInfo {
 
     pub fn write_file(&self){
         
-        // バリ画ファイル書き込む
-        std::fs::create_dir_all(BARIGA_FOLDER_PATH).unwrap();
-        let written_path = Path::new(BARIGA_FOLDER_PATH).join(&self.bariga_file_name);
-        
-        let shift_jis_file = ShiftjisFile{
-            file_path:written_path.to_str().unwrap().to_string(),
-            file_name:self.bariga_file_name.clone(),
-            utf8_content:self.bariga_content.clone(),
-            is_file:true,
-        };       
-        shift_jis_file.write(written_path.to_str().unwrap_or(""));
-
-        //表面ファイルを書き込む
-        let hyomen_folder_paths = [OMOTE_FOLDER_PATH,URA_FOLDER_PATH];
-        for hyomen_folder_path in hyomen_folder_paths.iter(){
-            std::fs::create_dir_all(hyomen_folder_path).unwrap();
-            let written_hyomen_path = Path::new(hyomen_folder_path).join(&self.hyomen_file_name);
-                
+        if self.is_file{
+            // バリ画ファイル書き込む
+            std::fs::create_dir_all(BARIGA_FOLDER_PATH).unwrap();
+            let written_path = Path::new(BARIGA_FOLDER_PATH).join(&self.bariga_file_name);
+            
             let shift_jis_file = ShiftjisFile{
                 file_path:written_path.to_str().unwrap().to_string(),
-                file_name:self.hyomen_file_name.clone(),
-                utf8_content:self.hyomen_content.clone(),
+                file_name:self.bariga_file_name.clone(),
+                utf8_content:self.bariga_content.clone(),
                 is_file:true,
             };       
-            shift_jis_file.write(written_hyomen_path.to_str().unwrap_or(""));
+            shift_jis_file.write(written_path.to_str().unwrap_or(""));
+    
+            //表面ファイルを書き込む
+            let hyomen_folder_paths = [OMOTE_FOLDER_PATH,URA_FOLDER_PATH];
+            for hyomen_folder_path in hyomen_folder_paths.iter(){
+                std::fs::create_dir_all(hyomen_folder_path).unwrap();
+                let written_hyomen_path = Path::new(hyomen_folder_path).join(&self.hyomen_file_name);
+                    
+                let shift_jis_file = ShiftjisFile{
+                    file_path:written_path.to_str().unwrap().to_string(),
+                    file_name:self.hyomen_file_name.clone(),
+                    utf8_content:self.hyomen_content.clone(),
+                    is_file:true,
+                };       
+                shift_jis_file.write(written_hyomen_path.to_str().unwrap_or(""));
+            }
         }
 
     }

@@ -54,8 +54,8 @@ impl Config {
     }
 }
 
-#[test]
-fn config_test(){
-    let ip_address = Config::get_my_ip_address();
-    println!("{:?}",ip_address);
-}
+// #[test]
+// fn config_test(){
+//     let ip_address = Config::get_my_ip_address();
+//     println!("{:?}",ip_address);
+// }

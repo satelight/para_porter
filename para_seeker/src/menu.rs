@@ -49,6 +49,8 @@ impl Menu {
 
     #[allow(dead_code)]
     pub async fn search_hinmoku_menu_2nd(para_infos:&Vec<ParaInfo>)-> Option<ParaInfo>{
+        
+        
         match para_infos.is_empty() {
             true => None,
             false => {
@@ -60,6 +62,7 @@ impl Menu {
                     let select_menu = format!("設備名:{} ファイル名:{}",machine_name,hyomen_file_name);
                     select_menus.push(select_menu);
                 }
+                select_menus.push(String::from("戻る"));
                 //　選んだら、そのデータを反映させる。
                 // バリ画、表、裏、表側のItemMaster.INIと裏のItemMaster.INIに書き込む。
                 // 終了
@@ -70,9 +73,11 @@ impl Menu {
                     .interact()
                     .unwrap();
             
-                // println!("You chose: {:?}", items[selection]);
-                
-                Some(para_infos[selection].clone())
+                if select_menus[selection] == String::from("戻る"){
+                    None
+                }else{
+                    Some(para_infos[selection].clone())
+                }
             }
         }
 

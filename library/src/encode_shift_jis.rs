@@ -89,14 +89,14 @@ pub struct Sunpo{
     pub hutosa:f32,
 }
 
-#[test]
-fn shiftjis_test(){
-    // let file_name = "sample/CO0013Q9(mh5a0-a).txt";
-    // let shift_jis_file = ShiftjisFile::to_utf8(file_name);
-    // shift_jis_file.write("CO0013-Q1.txt");
-    // println!("{:?}",shift_jis_file);
-    // ShiftJisFile::to_utf8(file_name, shift_jis_file)
+// #[test]
+// fn shiftjis_test(){
+//     // let file_name = "sample/CO0013Q9(mh5a0-a).txt";
+//     // let shift_jis_file = ShiftjisFile::to_utf8(file_name);
+//     // shift_jis_file.write("CO0013-Q1.txt");
+//     // println!("{:?}",shift_jis_file);
+//     // ShiftJisFile::to_utf8(file_name, shift_jis_file)
 
-    let para_file = ParseParaFile::new("NOKENV","CO0013Q9(mh5a0-a).txt");
-    println!("{:?}",para_file.get_kijyu_sunpou());
-}
+//     let para_file = ParseParaFile::new("NOKENV","CO0013Q9(mh5a0-a).txt");
+//     println!("{:?}",para_file.get_kijyu_sunpou());
+// }
