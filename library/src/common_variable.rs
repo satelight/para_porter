@@ -17,6 +17,12 @@ pub const BARIGA_FOLDER_PATH:&str = "D:/Item";
 #[cfg(not(debug_assertions))]
 pub const ITEMASTER_INI_PATH:&str = "D:/ItemMaster.INI";
 
+#[cfg(debug_assertions)]
+pub const SERVER_PORT:u16 = 8080;
+#[cfg(not(debug_assertions))]
+pub const SERVER_PORT:u16 = 49153;
+
+
 #[derive(Debug)]
 pub enum OmoteUra{
     Omote,

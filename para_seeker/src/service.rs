@@ -4,9 +4,11 @@ use library::encode_shift_jis::ParseParaFile;
 #[allow(unused_imports)]
 use dialoguer::Select;
 use dialoguer::Confirm;
-use library::common_variable::{BARIGA_FOLDER_PATH, OMOTE_FOLDER_PATH,URA_FOLDER_PATH,OmoteUra};
+use library::common_variable::{
+    BARIGA_FOLDER_PATH, OMOTE_FOLDER_PATH,URA_FOLDER_PATH,OmoteUra,SERVER_PORT
+};
 use library::para_info::ParaInfo;
-// use library::setting::SettingJson;
+use library::setting::SettingJson;
 use library::item_master_ini::ItemMasteINI;
 use library::encode_shift_jis::ShiftjisFile;
 
@@ -52,9 +54,9 @@ pub fn see_my_folder(){
 pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     let mut para_infos:Vec<ParaInfo> = vec![];  
     // setting.jsonから他の設備のIPアドレスを取得。
-    // let setting_json = SettingJson::read(true);
-    // let friend_ips = setting_json.friend_ips;  
-    let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
+    let setting_json = SettingJson::read(true);
+    let friend_ips = setting_json.friend_ips;  
+    // let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
     // let hinmoku_code_arc = Arc::new(hinmoku_code);
 
     // http://取得したIPアドレス/receive_para/{hinmoku_code}
@@ -64,7 +66,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     for url in friend_ips.clone() {
         let hinmoku_code = String::from(hinmoku_code);
         let handler = tokio::spawn(async move {
-            let url = format!("http://{}:8080/receive_para/{}",url,hinmoku_code.clone());
+            let url = format!("http://{}:{}/receive_para/{}",url,SERVER_PORT,hinmoku_code.clone());
             let response_string = reqwest::get(&url).await.unwrap().text().await.unwrap();
             let res:ParaInfo = serde_json::from_str(&response_string).unwrap();
             res    
@@ -81,6 +83,36 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
         }
     }
     para_infos
+}
+
+pub async fn receive_friend_ips()->Vec<SettingJson>{
+    let mut setting_jsons:Vec<SettingJson> = vec![];  
+    // setting.jsonから他の設備のIPアドレスを取得。
+    let setting_json = SettingJson::read(true);
+    let friend_ips = setting_json.friend_ips;  
+    // let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
+    // let hinmoku_code_arc = Arc::new(hinmoku_code);
+
+    // http://取得したIPアドレス/receive_para/{hinmoku_code}
+    // reqwest.getでコピーしたい品目がないか問い合わせ（並列処理）。
+    let mut handlers =vec![]; 
+    
+    for url in friend_ips.clone() {
+        let handler = tokio::spawn(async move {
+            let url = format!("http://{}:{}/receive_friend_ips",url,SERVER_PORT);
+            let response_string = reqwest::get(&url).await.unwrap().text().await.unwrap();
+            let res:SettingJson = serde_json::from_str(&response_string).unwrap();
+            res    
+        });
+        handlers.push(handler);
+    }
+    
+    for handler in handlers {
+        // 問い合わせたデータをvecで追加していく。
+        if let Ok(serde_json) =  handler.await{setting_jsons.push(serde_json)}
+    }
+    
+    setting_jsons
 }
 
 #[derive(Debug)]

@@ -5,6 +5,7 @@ use library::para_info::ParaInfo;
 pub enum HomeSelectionItem {
     SearchMyFolder,
     SearchOtherMachine,
+    FriendIPs,
     End,
 }
 
@@ -13,6 +14,7 @@ impl std::fmt::Display for HomeSelectionItem {
         match *self {
             HomeSelectionItem::SearchMyFolder => write!(f,"この設備のファイル一覧"),
             HomeSelectionItem::SearchOtherMachine => write!(f,"他の設備からコピーする"),
+            HomeSelectionItem::FriendIPs =>write!(f,"他の設備のIPアドレス取得する。"),
             HomeSelectionItem::End => write!(f,"終了"),
         }
     }
@@ -24,6 +26,7 @@ impl Menu {
         let items = vec![
             HomeSelectionItem::SearchMyFolder,
             HomeSelectionItem::SearchOtherMachine,
+            HomeSelectionItem::FriendIPs,
             HomeSelectionItem::End,
         ];
     

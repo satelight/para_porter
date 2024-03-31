@@ -21,14 +21,10 @@ async fn receive_para(hinmoku_code:web::Path<String>)-> HttpResponse {
 
 }
 
-#[get("/tell_friends")]
-async fn tell_friends(hinmoku_code:web::Path<String>)-> HttpResponse {
+#[get("/receive_friend_ips")]
+async fn receive_friend_ips()-> HttpResponse {
     let setting_file = SettingJson::read(true);
-    let machine_para = setting_file.machine_name;
-    let address = Config::get_my_ip_address();
-    let hinmoku_code = hinmoku_code.into_inner();
-    let para_info = ParaInfo::new(&hinmoku_code,&machine_para,&address);
-    HttpResponse::Ok().json(para_info)
+    HttpResponse::Ok().json(setting_file)
 
 }
 
@@ -50,7 +46,7 @@ async fn main() -> anyhow::Result<()> {
                 App::new()
                 .service(index)
                 .service(receive_para)
-                .service(tell_friends)
+                .service(receive_friend_ips)
             })
             .bind(url)?
             .workers(2)

@@ -1,4 +1,6 @@
-const SETTING_DIR_PATH:&str = "setting";
+use std::collections::HashSet;
+use std::iter::FromIterator;
+pub const SETTING_DIR_PATH:&str = "setting";
 pub const SETTING_JSON_PATH:&str = "setting.json";
 
 #[derive(Debug,serde::Serialize,serde::Deserialize)]
@@ -33,7 +35,9 @@ impl SettingJson {
     }
 
     pub fn read(init_ok:bool)-> Self {
-        if init_ok {SettingJson::init();}
+        if init_ok {
+            SettingJson::init();
+        }
 
         let setting_folder = std::path::Path::new(SETTING_DIR_PATH);
         let setting_json_path = setting_folder.join(SETTING_JSON_PATH);
@@ -43,6 +47,30 @@ impl SettingJson {
         
         setting_file
     }
+
+
+    pub fn update_ips(&mut self,ips:&Vec<&str>){
+        for ip in ips.iter(){
+            self.friend_ips.push(ip.to_string());
+        }
+
+        let mut unique:HashSet<String> = HashSet::new();
+        for friend_ip in self.friend_ips.iter(){
+            unique.insert(friend_ip.to_string());
+        }
+
+        let vec_unique:Vec<String> = Vec::from_iter(unique);
+        self.friend_ips = vec_unique;
+    }
+
+
+    pub fn write_file(&self){
+        let setting_folder = std::path::Path::new(SETTING_DIR_PATH);
+        let setting_json_path = setting_folder.join(SETTING_JSON_PATH);
+        let f = std::fs::File::create(setting_json_path).unwrap();
+        serde_json::to_writer_pretty(f, &self).unwrap();
+    }
+
 }
 
 pub struct Config;
