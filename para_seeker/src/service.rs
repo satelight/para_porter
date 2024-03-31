@@ -65,12 +65,13 @@ pub async fn is_there_the_para_file(hinmoku_code: &str) -> Vec<ParaInfo> {
     let mut para_infos: Vec<ParaInfo> = vec![];
     // setting.jsonから他の設備のIPアドレスを取得。
     let setting_json = SettingJson::read(true);
-    let friend_ips = setting_json.friend_ips;
+    #[allow(unused_mut)]
+    let mut friend_ips = setting_json.friend_ips;
 
     #[cfg(not(debug_assertions))]
     let my_address = Config::get_my_ip_address();
     #[cfg(not(debug_assertions))]
-    if let Some(index) = friend_ips.iter().position(|ip| ip == my_address) {
+    if let Some(index) = friend_ips.iter().position(|ip| ip == &my_address) {
         friend_ips.remove(index);
     }
 
@@ -118,12 +119,13 @@ pub async fn receive_friend_ips() -> Vec<SettingJson> {
     let mut setting_jsons: Vec<SettingJson> = vec![];
     // setting.jsonから他の設備のIPアドレスを取得。
     let setting_json = SettingJson::read(true);
-    let friend_ips = setting_json.friend_ips;
+    #[allow(unused_mut)]
+    let mut friend_ips = setting_json.friend_ips;
 
     #[cfg(not(debug_assertions))]
     let my_address = Config::get_my_ip_address();
     #[cfg(not(debug_assertions))]
-    if let Some(index) = friend_ips.iter().position(|ip| ip == my_address) {
+    if let Some(index) = friend_ips.iter().position(|ip| ip == &my_address) {
         friend_ips.remove(index);
     }
 
