@@ -57,10 +57,15 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     let mut para_infos:Vec<ParaInfo> = vec![];  
     // setting.jsonから他の設備のIPアドレスを取得。
     let setting_json = SettingJson::read(true);
-    let friend_ips = setting_json.friend_ips;  
-    // let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
-    // let hinmoku_code_arc = Arc::new(hinmoku_code);
-
+    let friend_ips = setting_json.friend_ips; 
+    
+    #[cfg(not(debug_assertions))]
+    let my_address = Config::get_my_ip_address();
+    #[cfg(not(debug_assertions))]
+    if let Some(index) = friend_ips.iter().position(|ip|ip==my_address){
+        friend_ips.remove(index);
+    }
+    
     // http://取得したIPアドレス/receive_para/{hinmoku_code}
     // reqwest.getでコピーしたい品目がないか問い合わせ（並列処理）。
     let mut handlers =vec![]; 

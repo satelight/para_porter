@@ -87,19 +87,14 @@ pub async fn search_ips(){
 
     let mut  setting_json  = match setting_json_path.exists(){
         true => {
-            println!("setting_json_path:{:?}",setting_json_path.exists());
             SettingJson::read(false)
         },
         false => {
-            println!("setting_json_path:{:?}",setting_json_path.exists());
             SettingJson::read(true)
         },
     };
-    println!("{:?}",setting_json);
 
-    setting_json.update_ips(&unique_ips);
-    println!("{:?}",setting_json);
-    
+    setting_json.update_ips(&unique_ips);    
     setting_json.write_file();
     
     println!("{:?}を取得しました。",unique_ips);
