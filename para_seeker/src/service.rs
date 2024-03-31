@@ -65,7 +65,7 @@ pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     if let Some(index) = friend_ips.iter().position(|ip|ip==my_address){
         friend_ips.remove(index);
     }
-    
+
     // http://取得したIPアドレス/receive_para/{hinmoku_code}
     // reqwest.getでコピーしたい品目がないか問い合わせ（並列処理）。
     let mut handlers =vec![]; 
@@ -105,7 +105,7 @@ pub async fn receive_friend_ips()->Vec<SettingJson>{
         friend_ips.remove(index);
     }
     
-    // http://取得したIPアドレス/receive_para/{hinmoku_code}
+    // http://取得したIPアドレス/receive_friend_ips
     // reqwest.getでコピーしたい品目がないか問い合わせ（並列処理）。
     let mut handlers =vec![]; 
     
