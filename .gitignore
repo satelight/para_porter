@@ -1,7 +1,10 @@
 /target
-para_porter_client/Item/*.txt
-para_porter_client/NOKENV/*.txt
-para_porter_client/NOKENV/*.ini
+para_seeker/Item/*.txt
+para_seeker/NOKENV/*.txt
+para_seeker/NOKENV/*.ini
 para_porter_server/Item/*.txt
 para_porter_server/NOKENV/*.txt
 para_porter_server/NOKENV/*.ini
+library/NOKENV/*.txt
+library/NOKENV/*.ini
+

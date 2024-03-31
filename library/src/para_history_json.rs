@@ -5,15 +5,15 @@ use std::{collections::HashMap, iter::zip};
 /// settingフォルダパス
 const SETTING_FOLDER: &str = "setting";
 
-/// パラメータのメタ情報一覧を保存するpara_history.jsonのパス
-const HISTORY_JSON: &str = "para_history.json";
+/// パラメータのメタ情報一覧を保存するpara_porter_log.jsonのパス
+const LOG_JSON: &str = "para_porter_log.json";
 
 pub struct ParaHistoryJson;
 
 impl ParaHistoryJson {
     pub fn init() {
         let folder_path = std::path::Path::new(SETTING_FOLDER);
-        let file_path = folder_path.join(HISTORY_JSON);
+        let file_path = folder_path.join(LOG_JSON);
         if !file_path.exists() {
             let f = std::fs::File::create(&file_path).unwrap();
             let mut content = HashMap::new();
@@ -45,15 +45,15 @@ impl ParaHistoryJson {
         }
     }
 
-    pub fn read() -> ParaHistoryContent {
+    pub fn read_from_static_path() -> ParaHistoryContent {
         let folder_path = std::path::Path::new(SETTING_FOLDER);
-        let file_path = folder_path.join(HISTORY_JSON);
+        let file_path = folder_path.join(LOG_JSON);
         let rdr = std::fs::File::open(file_path).unwrap();
         serde_json::from_reader(rdr).unwrap()
     }
 
     pub fn write(para_info: &ParaInfo) {
-        let mut json_content = self::ParaHistoryJson::read();
+        let mut json_content = self::ParaHistoryJson::read_from_static_path();
         json_content.insert(
             para_info.hinmoku_code.clone(),
             ParaHistoryInfo::new(
@@ -63,7 +63,7 @@ impl ParaHistoryJson {
             ),
         );
         let folder_path = std::path::Path::new(SETTING_FOLDER);
-        let file_path = folder_path.join(HISTORY_JSON);
+        let file_path = folder_path.join(LOG_JSON);
         let f = std::fs::File::create(file_path).unwrap();
         serde_json::to_writer_pretty(f, &json_content).unwrap();
     }

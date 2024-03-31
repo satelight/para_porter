@@ -54,7 +54,8 @@ async fn main()->anyhow::Result<(),anyhow::Error>{
                                     println!("裏表面ファイル:{}/{}に保存しました。",URA_FOLDER_PATH,selected_para_info.hyomen_file_name);
                                 }else {
                                     println!("裏表面ファイル:{}/{}に保存に失敗しました。",URA_FOLDER_PATH,selected_para_info.hyomen_file_name);
-        
+                            
+                                
                                 }
                             },
                             None => {println!("{}のファイルが存在していません。",hinmoku_code);}

@@ -13,7 +13,16 @@ pub struct ShiftjisFile {
 
 
 impl ShiftjisFile {
-    pub fn new(dir_path:&str,file_name:&str)->Self{
+    pub fn new(file_path:&str,file_name:&str,utf8_content:&str,is_file:bool)->Self{
+        Self { 
+            file_path:file_path.to_string(), 
+            file_name:file_name.to_string(), 
+            utf8_content: utf8_content.to_string(), 
+            is_file,
+        }
+    }
+
+    pub fn read_from_file_path(dir_path:&str,file_name:&str)->Self{
         let file_path = std::path::Path::new(dir_path).join(file_name);
         match std::fs::read(&file_path){
             Ok(file_data) =>{
@@ -37,6 +46,8 @@ impl ShiftjisFile {
 
     pub fn write(&self,to_path:&str)-> bool{
         let (encode,_,_) = encoding_rs::SHIFT_JIS.encode(&self.utf8_content);
+        std::fs::write("NOKENV/Item.ini", &encode).unwrap();
+        
         std::fs::write(to_path, encode).unwrap();
         true
     }
@@ -49,8 +60,8 @@ pub struct ParseParaFile{
 }
 
 impl ParseParaFile {
-    pub fn new(dir_path:&str,file_name:&str)->Self{
-        let shift_jis_file = ShiftjisFile::new(dir_path,file_name);
+    pub fn read_from_file_path(dir_path:&str,file_name:&str)->Self{
+        let shift_jis_file = ShiftjisFile::read_from_file_path(dir_path,file_name);
         let mut insert_hashmap = HashMap::new();        
         let conf = Ini::load_from_str(&shift_jis_file.utf8_content).unwrap();
         for (option_section,properies) in conf.iter(){

@@ -4,9 +4,10 @@ use library::encode_shift_jis::ParseParaFile;
 #[allow(unused_imports)]
 use dialoguer::Select;
 use dialoguer::Confirm;
-use library::common_variable::{BARIGA_FOLDER_PATH, OMOTE_FOLDER_PATH,URA_FOLDER_PATH};
+use library::common_variable::{BARIGA_FOLDER_PATH, OMOTE_FOLDER_PATH,URA_FOLDER_PATH,OmoteUra};
 use library::para_info::ParaInfo;
-use library::setting::SettingJson;
+// use library::setting::SettingJson;
+use library::item_master_ini::ItemMasteINI;
 use library::encode_shift_jis::ShiftjisFile;
 
 pub fn see_my_folder(){
@@ -18,7 +19,7 @@ pub fn see_my_folder(){
                 let file_name = dir_entry.file_name().to_str().unwrap().to_string();
                 if file_name.contains(".txt"){
                     // println!("file_name:{:?},find_number{:?}",file_name,find_number);
-                    let parse_file = ParseParaFile::new(OMOTE_FOLDER_PATH,&file_name);
+                    let parse_file = ParseParaFile::read_from_file_path(OMOTE_FOLDER_PATH,&file_name);
                     if let Some(sunpo) = parse_file.get_kijyu_sunpou(){find_files.push(sunpo)};
                 };
             }
@@ -51,8 +52,8 @@ pub fn see_my_folder(){
 pub async fn is_there_the_para_file(hinmoku_code:&str)->Vec<ParaInfo>{
     let mut para_infos:Vec<ParaInfo> = vec![];  
     // setting.jsonから他の設備のIPアドレスを取得。
-    let setting_json = SettingJson::read(true);
-    let friend_ips = setting_json.friend_ips;  
+    // let setting_json = SettingJson::read(true);
+    // let friend_ips = setting_json.friend_ips;  
     let friend_ips = vec![String::from("127.0.0.1"),String::from("127.0.0.1")];
     // let hinmoku_code_arc = Arc::new(hinmoku_code);
 
@@ -98,28 +99,42 @@ impl WriteResult{
 
 pub async fn put_files_several_folder(selected_para_info:&ParaInfo)->WriteResult{
     let mut write_result = WriteResult::new_as_all_false();
+    let hinmoku_code = &selected_para_info.hinmoku_code;
     let bariga_file_name = &selected_para_info.bariga_file_name;
     let hyomen_file_name = &selected_para_info.hyomen_file_name;
-    let bariga_path = Path::new(BARIGA_FOLDER_PATH).join(bariga_file_name);
-    let omote_path = Path::new(OMOTE_FOLDER_PATH).join(hyomen_file_name);
-    let ura_path = Path::new(URA_FOLDER_PATH).join(hyomen_file_name);
+    
+    let bariga_dir_path = Path::new(BARIGA_FOLDER_PATH);
+    let omote_dir_path = Path::new(OMOTE_FOLDER_PATH);
+    let ura_dir_path = Path::new(URA_FOLDER_PATH);
+    
+    let bariga_path = bariga_dir_path.join(bariga_file_name);
+    let omote_path = omote_dir_path.join(hyomen_file_name);
+    let ura_path = ura_dir_path.join(hyomen_file_name);
 
-    // if let true = bariga_path.exists() {
-        let bariga_shift_jis_file = ShiftjisFile::new(BARIGA_FOLDER_PATH,&bariga_file_name);
+
+
+    if bariga_dir_path.exists() {
+        let bariga_shift_jis_file = ShiftjisFile::read_from_file_path(BARIGA_FOLDER_PATH,&bariga_file_name);
         bariga_shift_jis_file.write(bariga_path.to_str().unwrap());
         write_result.bariga = true;
-    // }
-
-    if let true = omote_path.exists() {
-        let bariga_shift_jis_file = ShiftjisFile::new(OMOTE_FOLDER_PATH,&hyomen_file_name);
+    }
+    
+    if omote_dir_path.exists() {
+        let bariga_shift_jis_file = ShiftjisFile::read_from_file_path(OMOTE_FOLDER_PATH,&hyomen_file_name);
         bariga_shift_jis_file.write(omote_path.to_str().unwrap());
+        let mut omote_ini_file = ItemMasteINI::read(OmoteUra::Omote);
+        omote_ini_file.update(&hinmoku_code, &hyomen_file_name);
+        omote_ini_file.write_file();
         write_result.omote = true;
-
+        
     }
 
-    if let true = bariga_path.exists() {
-        let bariga_shift_jis_file = ShiftjisFile::new(URA_FOLDER_PATH,&hyomen_file_name);
+    if ura_dir_path.exists() {
+        let bariga_shift_jis_file = ShiftjisFile::read_from_file_path(URA_FOLDER_PATH,&hyomen_file_name);
         bariga_shift_jis_file.write(ura_path.to_str().unwrap());
+        let mut ura_ini_file = ItemMasteINI::read(OmoteUra::Ura);
+        ura_ini_file.update(&hinmoku_code, &hyomen_file_name);
+        ura_ini_file.write_file();
         write_result.ura = true;
     }
 
@@ -128,3 +143,4 @@ pub async fn put_files_several_folder(selected_para_info:&ParaInfo)->WriteResult
 
 
 }
+

@@ -23,7 +23,9 @@ pub struct ParaInfo {
 
 
 impl ParaInfo {
-    pub fn new(hinmoku_code:&str,machine_name:&str,address:&str) -> Self{
+    pub fn new(hinmoku_code:&str,machine_name:&str,address:&str) -> Self {
+            #[allow(unused_assignments)]
+            let mut is_file = true;
             let mut bariga_file_name = String::from(hinmoku_code).to_uppercase();
             bariga_file_name.push_str(".txt");
             let bariga_file_name = bariga_file_name.clone();
@@ -31,8 +33,9 @@ impl ParaInfo {
             let hyomen_target_hinmoku = hyomen_target_hinmoku.slice(0,-1);
             // バリ画ファイル
             let path = std::path::Path::new(BARIGA_FOLDER_PATH).join(&bariga_file_name);
-            let bariga_file = ShiftjisFile::new(BARIGA_FOLDER_PATH,&bariga_file_name);
-            
+            let bariga_file = ShiftjisFile::read_from_file_path(BARIGA_FOLDER_PATH,&bariga_file_name);
+            is_file = bariga_file.is_file;
+
             let mut unix_seconds = 0;
             if let Ok(meta) = fs::metadata(path){
                 let mtime = FileTime::from_last_modification_time(&meta);
@@ -55,8 +58,10 @@ impl ParaInfo {
             }
 
             let mut hyomen_content = String::new();
-            if !hyomen_file_name.is_empty(){
-                let hyomen_file = ShiftjisFile::new(OMOTE_FOLDER_PATH,&hyomen_file_name);
+            if hyomen_file_name.is_empty(){
+                is_file = false
+            } else {
+                let hyomen_file = ShiftjisFile::read_from_file_path(OMOTE_FOLDER_PATH,&hyomen_file_name);
                 hyomen_content = hyomen_file.utf8_content;
             }
             
@@ -68,7 +73,7 @@ impl ParaInfo {
                 hyomen_content,
                 update_time_unix_seconds: unix_seconds, 
                 machine_name:machine_name.to_string(),
-                is_file:bariga_file.is_file,
+                is_file,
                 address:address.to_string(),
             }
     }
